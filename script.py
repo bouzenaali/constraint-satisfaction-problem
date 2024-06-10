@@ -1,4 +1,3 @@
-import streamlit as st
 from constraint import Problem, AllDifferentConstraint
 import pandas as pd
 
@@ -70,9 +69,6 @@ def generate_timetable(courses, teachers, days_per_course):
     solution = problem.getSolution()
     return solution
 
-# Streamlit UI
-st.title("Timetable Scheduler for Semester 2 1CS")
-
 # Default courses and predefined teacher names
 default_courses = [
     "Securite", "MethodesFormelles", "NumericalAnalysis", "Entrepreneuriat", 
@@ -88,30 +84,28 @@ default_teacher_names = {
     "Reseaux2": ["Dr. Djennadi", "Dr. Kaci", "Prof. Djennan", "Dr. Djerbi"], 
     "ArtificialIntelligence": ["Prof. Zaidi", "Dr. Isaadi", "Dr. Kaci"]
 }
-days = ["Sun", "Mon", "Tue", "Wed", "Thu"]
+days_per_course = {
+    "Securite": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "MethodesFormelles": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "NumericalAnalysis": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "Entrepreneuriat": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "RechercheOperationnelle2": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "DistributedArchitecture": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "Reseaux2": ["Sun", "Mon", "Tue", "Wed", "Thu"],
+    "ArtificialIntelligence": ["Sun", "Mon", "Tue", "Wed", "Thu"]
+}
 
-# User input for courses
-courses = st.multiselect("Select Courses", options=default_courses, default=default_courses)
+solution = generate_timetable(default_courses, default_teacher_names, days_per_course)
 
-# User input for days for each selected course
-teachers = {}
-days_per_course = {}
-for course in courses:
-    selected_days = st.multiselect(f"Select Days for {course}", options=days, default=days)
-    teachers[course] = default_teacher_names[course]
-    days_per_course[course] = selected_days
-
-if st.button("Generate Timetable"):
-    solution = generate_timetable(courses, teachers, days_per_course)
+if solution:
+    print("Generated Timetable:")
+    timetable_data = []
+    for var, slot in solution.items():
+        course, class_type = var.split('_')
+        teachers = ", ".join(default_teacher_names[course])
+        timetable_data.append((course, class_type, slot, teachers))
     
-    if solution:
-        st.write("Generated Timetable:")
-        timetable_data = []
-        for var, slot in solution.items():
-            course, class_type = var.split('_')
-            timetable_data.append((course, class_type, slot))
-        
-        df = pd.DataFrame(timetable_data, columns=["Course", "Class Type", "Time Slot"])
-        st.table(df)
-    else:
-        st.write("No solution found")
+    df = pd.DataFrame(timetable_data, columns=["Course", "Class Type", "Time Slot", "Teachers"])
+    print(df)
+else:
+    print("No solution found")
