@@ -36,8 +36,8 @@ pip install python-constraint pandas
 python script.py
 ```
 
-Example Output
-constraint-satisfaction-problem/screenshot.png
+## Example Output
+![](/Screenshot.png)
 
 
 
